@@ -1,11 +1,16 @@
 import Foundation
 import SwiftUI
-
-enum LoadState: Equatable { case idle, loading, loaded, failed(String) }
+enum LoadState: Equatable {
+    case idle
+    case loading
+    case loaded
+    case failed(String)
+}
 
 @MainActor
 final class CharactersVM: ObservableObject {
-    @Published var characters: [RWCharacter] = []
+    
+    @Published var characters: [RMCharacter] = []
     @Published var info: Info? = nil
     @Published var state: LoadState = .idle
     @Published var searchText: String = ""
@@ -13,7 +18,9 @@ final class CharactersVM: ObservableObject {
     private let api = APIClient()
     private var currentPage: Int = 1
     
-    func firstLoad() async { await load(page: 1, name: nil) }
+    func firstLoad() async {
+        await load(page: 1, name: nil)
+    }
     
     func applySearch() async {
         currentPage = 1
@@ -35,7 +42,7 @@ final class CharactersVM: ObservableObject {
     func load(page: Int?, name: String?) async {
         state = .loading
         do {
-            let resp = try await api.fetchCharacter(page:page, name:name)
+            let resp = try await api.fetchCharacters(page: page, name: name)
             characters = resp.results
             info = resp.info
             state = .loaded
